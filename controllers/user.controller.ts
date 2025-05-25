@@ -28,7 +28,7 @@ export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email, password } = req.body;
-
+       
       const isEmailExist = await userModel.findOne({ email });
       console.log(isEmailExist);
       if (isEmailExist) {
@@ -154,7 +154,7 @@ export const loginUser = CatchAsyncError(
       }
 
       const user = await userModel.findOne({ email }).select("+password");
-
+      
       if (!user) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
@@ -163,8 +163,13 @@ export const loginUser = CatchAsyncError(
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
-      sendToken(user, 200, res);
+      console.log("Stored password:", user.password);
+      console.log("Entered password:", password);
+      console.log("Password match:", isPasswordMatch);
+      console.log(user,res);
+      await sendToken(user, 200, res);
     } catch (error: any) {
+      console.log(error.message);
       return next(new ErrorHandler(error.message, 400));
     }
   }

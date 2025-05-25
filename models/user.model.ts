@@ -75,24 +75,35 @@ userSchema.pre<IUser>("save", async function (next) {
 
 // sign access token
 userSchema.methods.SignAccessToken = function () {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN as string|| "", {
     expiresIn: "5m",
   });
 };
 
 // sign refresh token
 userSchema.methods.SignRefreshToken = function () {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || "", {
+  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN as string|| "", {
     expiresIn: "3d",
   });
 };
 
 // compare password
+// userSchema.methods.comparePassword = async function (
+//   enteredPassword: string
+// ): Promise<boolean> {
+//   return await bcrypt.compare(enteredPassword, this.password);
+// };
 userSchema.methods.comparePassword = async function (
   enteredPassword: string
 ): Promise<boolean> {
-  return await bcrypt.compare(enteredPassword, this.password);
+  try {
+    return await bcrypt.compare(enteredPassword, this.password);
+  } catch (error) {
+    console.error('Error comparing passwords', error);
+    return false;
+  }
 };
+
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);
 

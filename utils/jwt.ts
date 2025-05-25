@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { Response } from "express";
+import { response, Response } from "express";
 import { IUser } from "../models/user.model";
 import { redis } from "./redis";
 
@@ -38,9 +38,12 @@ export const refreshTokenOptions: ITokenOptions = {
   secure: true,
 };
 
-export const sendToken = (user: IUser, statusCode: number, res: Response) => {
+export const sendToken = async (user: IUser, statusCode: number, res: Response) => {
   const accessToken = user.SignAccessToken();
+  console.log(res)
   const refreshToken = user.SignRefreshToken();
+  console.log("Access Token:", accessToken);
+  console.log("Refresh Token:", refreshToken);
   // upload session to redis
   redis.set(user._id, JSON.stringify(user) as any);
 
